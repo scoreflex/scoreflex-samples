@@ -1,0 +1,84 @@
+HTML,
+BODY {
+  height:100%;
+  margin:0;
+  padding:0;
+}
+BODY {
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+BUTTON {
+  padding:0.3em 1em;
+  font-size:1em;
+  font-weight:bold;
+  border-radius:5px;
+  box-shadow:0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin:0.2em;
+  cursor:pointer;
+  border:1px solid transparent;
+}
+BUTTON:hover {
+  box-shadow:0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+BUTTON.blue {
+  background-color: #4FA9B8;
+  border-color: rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 #318B9A;
+}
+BUTTON.green {
+  background-color: #B4BA6C;
+  border-color: rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 #969C4E;
+}
+BUTTON.red {
+  background-color: #A63D34;
+  border-color: rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 #881F16;
+}
+BUTTON.yellow {
+  background-color: #A38639;
+  border-color: rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 #85681B;
+}
+BUTTON.gray {
+  background-color: #6E7273;
+  border-color: rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 #505455;
+}
+
+#game {
+  padding:1em;
+}
+
+#game.mode_solo .playground_challenge,
+#game.mode_challenge .playground_solo {
+  display:none;
+}
+
+#playground {
+  padding:1em;
+  border:1px solid #000;
+  margin:0.5em 0;
+}
+
+#game #playground {
+  transition:background-color 1.2s ease 0s;
+}
+#game.mode_solo      #playground {background-color:rgba(79, 169, 184, 0.8);}
+#game.mode_challenge #playground {background-color:rgba(180, 186, 108, 0.8)}
+
+.playground_solo,
+.playground_challenge {
+  font-weight:bold;
+}
+
+#debug_actions {
+  margin-top:5em;
+  font-size:0.75em;
+}

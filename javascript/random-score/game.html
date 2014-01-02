@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RandGame</title>
+  <link href="./scoreflexSDK/style/webclient.css" type="text/css" rel="stylesheet">
+  <link href="./game.css" type="text/css" rel="stylesheet">
+
+</head>
+<body>
+
+<div id="game" class="mode_solo">
+  <div id="game_modes">
+    <div class="action_modes">
+      <button id="actionPlaySolo" class="blue">Play solo</button>
+      <button id="actionShowChallenges" class="green">Show challenges</button>
+    </div>
+  </div>
+  <div id="playground">
+    <div>
+      <span class="playground_solo">Mode: solo</span>
+      <span class="playground_challenge">Mode: challenge</span>
+    </div>
+    <button id="playButton" class="red">Play !</button> Score= <span id="score">0</span>
+    <div id="status">&nbsp;</div>
+  </div>
+  <div id="actions">
+    More...<br />
+    <div class="playground_solo actions_leaderboard">
+      <button id="actionShowLeaderboard" class="yellow">Show leaderboard</button>
+      <button id="actionShowRankbox" class="yellow">Show rankbox</button>
+    </div>
+    <button id="actionShowProfile" class="yellow">Show profile (WEB)</button>
+  </div>
+  <div id="debug_actions">
+    <div class="actions_generic">
+      DEBUG actions<br />
+      <button id="actionPing" class="gray">Ping</button>
+      <button id="actionGetPlayer" class="gray">Get profile (REST)</button>
+    </div>
+    <div class="actions_challenge">
+    </div>
+    <div class="actions_sdk">
+      SDK control actions<br />
+      <button id="actionCloseWebClient" class="gray">close web client</button>
+      <button id="actionReset" class="gray">reset</button>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="./scoreflexSDK/libs/CryptoJS/rollups/hmac-sha1.js"></script>
+<script type="text/javascript" src="./scoreflexSDK/libs/CryptoJS/components/enc-base64-min.js"></script>
+<script type="text/javascript" src="./scoreflexSDK/libs/Json/json2.js"></script>
+<script type="text/javascript" src="./scoreflexSDK/scoreflexSDK.js"></script>
+<script type="text/javascript" src="./game.js"></script>
+</body>
+</html>
