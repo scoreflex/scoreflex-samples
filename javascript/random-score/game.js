@@ -1,14 +1,4 @@
-var listenEvent = function(element, eventType, handler) {
-  if(element.addEventListener) {
-    element.addEventListener(eventType, handler, false);
-  }
-  else if(element.attachEvent) {
-    element.attachEvent( "on" + eventType, handler);
-  }
-};
-
 var myGame = (function() {
-
   /* Scoreflex identifiers */
   // FILL THIS VARIABLES
   var gameName = 'myGameName';
@@ -19,10 +9,22 @@ var myGame = (function() {
   var useSandbox = true;
 
   // init Scoreflex
-  var ScoreflexSDK = Scoreflex();
-  //window.ScoreflexSDK = ScoreflexSDK;
-  ScoreflexSDK.initialize(clientId, clientSecret, useSandbox);
+  var ScoreflexSDK = Scoreflex(clientId, clientSecret, useSandbox);
 
+
+
+  /*====================*/
+  /*== GAME INTERNAL ==*/
+
+  // helper
+  var listenEvent = function(element, eventType, handler) {
+    if(element.addEventListener) {
+      element.addEventListener(eventType, handler, false);
+    }
+    else if(element.attachEvent) {
+      element.attachEvent( "on" + eventType, handler);
+    }
+  };
 
   /* RAND GAME */
   var gameBox = document.getElementById("game");
@@ -51,7 +53,7 @@ var myGame = (function() {
     scoreBox.innerHTML = 0;
   };
 
-  /* CHANGE CONTEXT */
+  /* CHANGE GAME CONTEXT (solo/challenge) */
   var playSolo = document.getElementById("actionPlaySolo");
   playSolo.onclick = function() {
     displaySoloMode(defaultLeaderboard);
@@ -85,7 +87,24 @@ var myGame = (function() {
     }
   };
 
-  /* SOLO */
+  /* GAME PLAY */
+  var playButton = document.getElementById("playButton");
+  playButton.onclick = function() {
+    var score = Math.floor(Math.random() * 1000) + 300;
+    scoreBox.innerHTML = score;
+    if (context.mode === 'solo') {
+      sendSoloScore();
+    }
+    else if (context.mode === 'challenge') {
+      sendChallengeScore();
+    }
+  };
+
+
+  /*==========================*/
+  /*== SCOREFLEX SDK CALLS ==*/
+
+  /* SOLO : send score request */
   var sendSoloScore = function() {
     if (context.mode === 'solo') {
       var score = parseInt(scoreBox.innerHTML, 10);
@@ -94,7 +113,7 @@ var myGame = (function() {
     }
   };
 
-  /* CHALLENGE */
+  /* CHALLENGE : send score request */
   var sendChallengeScore = function() {
     if (context.mode === 'challenge') {
       var score = parseInt(scoreBox.innerHTML, 10);
@@ -116,20 +135,7 @@ var myGame = (function() {
     }
   };
 
-  /* GAME PLAY */
-  var playButton = document.getElementById("playButton");
-  playButton.onclick = function() {
-    var score = Math.floor(Math.random() * 1000) + 300;
-    scoreBox.innerHTML = score;
-    if (context.mode === 'solo') {
-      sendSoloScore();
-    }
-    else if (context.mode === 'challenge') {
-      sendChallengeScore();
-    }
-  };
-
-  /* Scoreflex game-related requests */
+  /* Other Scoreflex game-related requests */
   var showLeaderboard = document.getElementById("actionShowLeaderboard");
   showLeaderboard.onclick = function() {
     ScoreflexSDK.showLeaderboard(defaultLeaderboard, {collapsingMode:'none'});
@@ -138,6 +144,25 @@ var myGame = (function() {
   var showRankbox = document.getElementById("actionShowRankbox");
   showRankbox.onclick = function() {
     ScoreflexSDK.showRankbox(defaultLeaderboard);
+  };
+
+  var showProfile = document.getElementById("actionShowProfile");
+  showProfile.onclick = function() {
+    ScoreflexSDK.showProfile();
+  };
+
+  /* Scoreflex debug requests */
+  var sendPing = document.getElementById("actionPing");
+  sendPing.onclick = function() {
+    ScoreflexSDK.ping({
+      onload: function() {
+        var pong = (this.responseJSON || {}).pong || false;
+        console.log(pong ? 'pong' : 'error');
+      },
+      onerror: function() {
+        console.log('error');
+      }
+    });
   };
 
   var getPlayer = document.getElementById("actionGetPlayer");
@@ -152,23 +177,6 @@ var myGame = (function() {
     });
   };
 
-  /* Scoreflex requests */
-  var sendPing = document.getElementById("actionPing");
-  sendPing.onclick = function() {
-    ScoreflexSDK.ping({
-      onload: function() {
-        var pong = (this.responseJSON || {}).pong || false;
-        console.log(pong ? 'pong' : 'error');
-      }
-    });
-  };
-
-  var showProfile = document.getElementById("actionShowProfile");
-  showProfile.onclick = function() {
-    ScoreflexSDK.showProfile();
-  };
-
-  /* Scoreflex SDK-related requests */
   var closeWebClient = document.getElementById("actionCloseWebClient");
   closeWebClient.onclick = function() {
     ScoreflexSDK.closeWebClient();
@@ -180,7 +188,7 @@ var myGame = (function() {
     window.location.href = window.location.href;
   };
 
-  // listen for Scoreflex events
+  /* Scoreflex events listening */
   var sfxEventHandler = function(event) {
     var eventData = event.data || {};
     var name = eventData.name;
