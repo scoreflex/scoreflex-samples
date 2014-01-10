@@ -10,7 +10,7 @@ var myGame = (function() {
 
   // init Scoreflex
   var ScoreflexSDK = Scoreflex(clientId, clientSecret, useSandbox);
-
+  var soloLeaderboard = ScoreflexSDK.Leaderboards.get(defaultLeaderboard);
 
 
   /*====================*/
@@ -42,13 +42,12 @@ var myGame = (function() {
     context.params = {leaderboardId: leaderboardId};
     scoreBox.innerHTML = 0;
   };
-  var displayChallengeMode = function(instanceId, configId) {
+  var displayChallengeMode = function(challenge) {
     game.classList.remove('mode_solo');
     game.classList.add('mode_challenge');
     context.mode = 'challenge';
     context.params = {
-      instanceId:instanceId,
-      configId:configId
+      challenge:challenge
     };
     scoreBox.innerHTML = 0;
   };
@@ -61,15 +60,15 @@ var myGame = (function() {
 
   var showChallenges = document.getElementById("actionShowChallenges");
   showChallenges.onclick = function() {
-    ScoreflexSDK.showChallenges();
+    ScoreflexSDK.Challenges.showChallenges();
   };
 
   var playLeaderboard = function(leaderboardId) {
     displaySoloMode(leaderboardId);
   };
 
-  var playChallengeInstance = function(instanceId, configId) {
-    displayChallengeMode(instanceId, configId);
+  var playChallengeInstance = function(challenge) {
+    displayChallengeMode(challenge);
   };
 
   /* STATUS */
@@ -108,7 +107,7 @@ var myGame = (function() {
   var sendSoloScore = function() {
     if (context.mode === 'solo') {
       var score = parseInt(scoreBox.innerHTML, 10);
-      ScoreflexSDK.submitScoreAndShowRankbox(context.params.leaderboardId, score);
+      soloLeaderboard.submitScoreAndShowRankbox(score);
       setStatus("Sending score ...", 1000);
     }
   };
@@ -117,17 +116,18 @@ var myGame = (function() {
   var sendChallengeScore = function() {
     if (context.mode === 'challenge') {
       var score = parseInt(scoreBox.innerHTML, 10);
+      var challengeInstance = context.params.challenge;
       setStatus("Sending score ...", 2500);
-      ScoreflexSDK.submitChallengeTurnScore(context.params.instanceId, score, {}, {
+      challengeInstance.submitTurnScore(score, {}, {
         onload: function() {
           // the score is not available in real time. Wait 2 seconds.
           setTimeout(
             (function(scope) {
               return function() {
-                scope.showChallengeInstance(context.params.instanceId);
+                scope.showDetails();
                 setStatus("Sent", 1000);
               };
-            })(ScoreflexSDK),
+            })(challengeInstance),
             2000
           );
         }
@@ -138,17 +138,20 @@ var myGame = (function() {
   /* Other Scoreflex game-related requests */
   var showLeaderboard = document.getElementById("actionShowLeaderboard");
   showLeaderboard.onclick = function() {
-    ScoreflexSDK.showLeaderboard(defaultLeaderboard, {collapsingMode:'none'});
+    soloLeaderboard.show({collapsingMode:'none'});
   };
 
   var showRankbox = document.getElementById("actionShowRankbox");
   showRankbox.onclick = function() {
-    ScoreflexSDK.showRankbox(defaultLeaderboard);
+    soloLeaderboard.showRankbox();
   };
 
   var showProfile = document.getElementById("actionShowProfile");
   showProfile.onclick = function() {
-    ScoreflexSDK.showProfile();
+    var currentPlayer = ScoreflexSDK.Players.getCurrent();
+    if (currentPlayer) {
+      currentPlayer.showProfile();
+    }
   };
 
   /* Scoreflex debug requests */
@@ -167,19 +170,15 @@ var myGame = (function() {
 
   var getPlayer = document.getElementById("actionGetPlayer");
   getPlayer.onclick = function() {
-    ScoreflexSDK.get("/players/me", {}, {
-      onload:function(){
-        console.log(this.responseJSON);
-      },
-      onerror:function(){
-        console.log('error');
-      }
-    });
+    var currentPlayer = ScoreflexSDK.Players.getCurrent();
+    if (currentPlayer) {
+      console.log(currentPlayer.getData());
+    }
   };
 
   var closeWebClient = document.getElementById("actionCloseWebClient");
   closeWebClient.onclick = function() {
-    ScoreflexSDK.closeWebClient();
+    ScoreflexSDK.WebClient.close();
   };
 
   var resetSession = document.getElementById("actionReset");
@@ -206,8 +205,9 @@ var myGame = (function() {
       console.log("Run game for leaderboardId: "+leaderboardId);
     }
     else if (name === 'challenge') {
-      var challengeInstanceId = eventData.challengeInstanceId;
-      var challengeConfigId = eventData.challengeConfigId;
+      var challengeInstance = eventData.challenge;
+      var challengeInstanceId = challengeInstance.getInstanceId();
+      var challengeConfigId = challengeInstance.getConfigId();
       playChallengeInstance(challengeInstanceId, challengeConfigId);
       console.log('Run challenge config:'+challengeConfigId+ ' - instance: '+challengeInstanceId);
     }
